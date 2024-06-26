@@ -52,7 +52,8 @@ void loop() {
       calculateFinalAdvance();
       fireTime = micros() + finalAdvanceTime;
 
-      controlIgnition();
+      controlIgnition(RPM);
+      
 } //end main loop()
 
 void updateRevTimeArray(unsigned long newRevTime) {
@@ -73,11 +74,11 @@ void calculateFinalAdvance() {
   finalAdvanceTime = averageRevTime - (degreesConversion * degreesAdvanced);
 }
 
-void controlIgnition() {
-  if (RPM < 2000) {
+void controlIgnition(float revolutions) {
+  if (revolutions < 2000) {
     digitalWrite(ignPin, LOW);
     Serial.println("We are in the LESS than 2000 RPM range");
-  } else if (RPM>=2000 && RPM<RPM_LIMIT){
+  } else if (revolutions>=2000 && revolutions<RPM_LIMIT){
     //Some logic that advances the ignition 
   }
 }
