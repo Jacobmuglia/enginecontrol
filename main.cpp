@@ -44,13 +44,14 @@ void loop() {
     else {
       firstFrame = true;
       digitalWrite(ignPin, HIGH); // Ensure ignition is not blocked by default
-  }   
+  }
 
   //Updates at system refresh rate 16MHz
-      updateRevTimeArray(revTime);
-      calculateAverageRevTime();
-      calculateFinalAdvance();
-      fireTime = micros() + finalAdvanceTime;
+      updateRevTimeArray(revTime); //Adds current RPM to RPM array, pops current last value
+      calculateAverageRevTime(); // RevTimeArray / RevTimeArray.length
+      calculateFinalAdvance(); //returns absolute time ignition should be advanced
+      fireTime = micros() + finalAdvanceTime; //returns current time + absolute time ignition should be advanced
+                                              //not used right now
 
       controlIgnition(RPM);
       
