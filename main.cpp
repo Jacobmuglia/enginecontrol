@@ -1,7 +1,7 @@
 const int hallSensorPin = 8; // Hall sensor input pin
 const int ignPin = 4;        // Ignition control output pin
 const float RPM_LIMIT = 9000.0;
-const int degreesAdvanced = 15;
+const int degreesAdvanced = 5;
 const int smoothingWindowSize = 5; // Number of revolutions to average for smoothing
 
 bool firstFrame = false;
@@ -16,6 +16,7 @@ unsigned long averageRevTime = 0;
 unsigned long degreesConversion = 0;
 unsigned long finalAdvanceTime = 0;
 unsigned long fireTime = 0;
+unsigned long advancedTrigger;
 
 void setup() {
   pinMode(ignPin, OUTPUT);
@@ -26,8 +27,9 @@ void setup() {
 void loop() {
   int sensorState = digitalRead(hallSensorPin);
 
+  //Updates every time propeller revolves
   if (sensorState == LOW) {
-    if (firstFrame) {
+    if (firstFrame) { 
       firstFrame = false;
       secondTimestamp = micros();
       revTime = secondTimestamp - firstTimestamp;
@@ -37,29 +39,21 @@ void loop() {
       }
 
       firstTimestamp = micros();
+      }
+    }
+    else {
+      firstFrame = true;
+      digitalWrite(ignPin, HIGH); // Ensure ignition is not blocked by default
+  }   
 
+  //Updates at system refresh rate 16MHz
       updateRevTimeArray(revTime);
       calculateAverageRevTime();
       calculateFinalAdvance();
-
       fireTime = micros() + finalAdvanceTime;
 
-      Serial.print("Avg Last 5: ");
-      Serial.println(averageRevTime);
-      Serial.print("RPM: ");
-      Serial.println(RPM);
-      Serial.print("Final Advance: ");
-      Serial.println(finalAdvanceTime);
-      Serial.print("fireTime: ");
-      Serial.println(fireTime);
-
       controlIgnition();
-    } else {
-      firstFrame = true;
-      digitalWrite(ignPin, HIGH); // Ensure ignition is not blocked by default
-    }
-  }
-}
+} //end main loop()
 
 void updateRevTimeArray(unsigned long newRevTime) {
   revTimeSum -= revTimes[0];
@@ -83,14 +77,7 @@ void controlIgnition() {
   if (RPM < 2000) {
     digitalWrite(ignPin, LOW);
     Serial.println("We are in the LESS than 2000 RPM range");
-  } else{
-    Serial.println("We are in the GREATER than 2000 RPM range");
-    if (micros() >= fireTime) {
-      digitalWrite(ignPin, LOW);
-      Serial.println("Setting ignPin LOW");
-    } else {
-      digitalWrite(ignPin, HIGH);
-      Serial.println("Setting ignPin HIGH");
-    }
+  } else if (RPM>=2000 && RPM<RPM_LIMIT){
+    //Some logic that advances the ignition 
   }
 }
