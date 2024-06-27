@@ -42,7 +42,6 @@ void loop() {
     }
   } else {
     firstFrame = true;
-    digitalWrite(ignPin, HIGH); // Ensure ignition is not blocked by default
   }
 
   // Updates at system refresh rate 16MHz
