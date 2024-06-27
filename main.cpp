@@ -26,7 +26,7 @@ void setup() {
 
 void loop() {
   int sensorState = digitalRead(hallSensorPin);
-
+  digitalWrite(ignPin, LOW);
   // Updates every time propeller revolves
   if (sensorState == LOW) {
     if (firstFrame) {
@@ -73,8 +73,8 @@ void calculateFinalAdvance() {
 }
 
 void controlIgnition(float revolutions) {
-  if (revolutions < 2000) {
-    digitalWrite(ignPin, LOW);
+  if (revolutions < 2000 && firstFrame) {
+    digitalWrite(ignPin, HIGH);
     lastFireTime = micros();
     Serial.println("We are in the LESS than 2000 RPM range");
   } else if (revolutions >= 2000 && revolutions < RPM_LIMIT) {
