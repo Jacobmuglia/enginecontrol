@@ -27,9 +27,9 @@ void setup() {
 void loop() {
   int sensorState = digitalRead(hallSensorPin);
 
-  //Updates every time propeller revolves
+  // Updates every time propeller revolves
   if (sensorState == LOW) {
-    if (firstFrame) { 
+    if (firstFrame) {
       firstFrame = false;
       secondTimestamp = micros();
       revTime = secondTimestamp - firstTimestamp;
@@ -39,22 +39,20 @@ void loop() {
       }
 
       firstTimestamp = micros();
-      }
     }
-    else {
-      firstFrame = true;
-      digitalWrite(ignPin, HIGH); // Ensure ignition is not blocked by default
+  } else {
+    firstFrame = true;
+    digitalWrite(ignPin, HIGH); // Ensure ignition is not blocked by default
   }
 
-  //Updates at system refresh rate 16MHz
-      updateRevTimeArray(revTime); //Adds current RPM to RPM array, pops current last value
-      calculateAverageRevTime(); // RevTimeArray / RevTimeArray.length
-      calculateFinalAdvance(); //returns absolute time ignition should be advanced
-      fireTime = micros() + finalAdvanceTime; //returns current time + absolute time ignition should be advanced
-                                              //not used right now
-      controlIgnition(RPM);
-      
-} //end main loop()
+  // Updates at system refresh rate 16MHz
+  updateRevTimeArray(revTime); // Adds current RPM to RPM array, pops current last value
+  calculateAverageRevTime(); // RevTimeArray / RevTimeArray.length
+  calculateFinalAdvance(); // Returns absolute time ignition should be advanced
+  fireTime = micros() + finalAdvanceTime; // Returns current time + absolute time ignition should be advanced
+                                          // Not used right now
+  controlIgnition(RPM);
+} // end main loop()
 
 void updateRevTimeArray(unsigned long newRevTime) {
   revTimeSum -= revTimes[0];
@@ -79,11 +77,14 @@ void controlIgnition(float revolutions) {
     digitalWrite(ignPin, LOW);
     lastFireTime = micros();
     Serial.println("We are in the LESS than 2000 RPM range");
-  } else if (revolutions>=2000 && revolutions<RPM_LIMIT){
-    if(lastFireTime + finalAdvanceTime < micros()){
+  } else if (revolutions >= 2000 && revolutions < RPM_LIMIT) {
+    if (lastFireTime + finalAdvanceTime < micros()) {
       digitalWrite(ignPin, LOW);
       lastFireTime = micros();
       Serial.println("We are in the GREATER than 2000 RPM range");
-    }else{
+    } else {
       digitalWrite(ignPin, HIGH);
+    }
+  }
 }
+
