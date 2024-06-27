@@ -16,7 +16,7 @@ unsigned long averageRevTime = 0;
 unsigned long degreesConversion = 0;
 unsigned long finalAdvanceTime = 0;
 unsigned long fireTime = 0;
-unsigned long advancedTrigger;
+unsigned long lastFireTime = 0;
 
 void setup() {
   pinMode(ignPin, OUTPUT);
@@ -52,7 +52,6 @@ void loop() {
       calculateFinalAdvance(); //returns absolute time ignition should be advanced
       fireTime = micros() + finalAdvanceTime; //returns current time + absolute time ignition should be advanced
                                               //not used right now
-
       controlIgnition(RPM);
       
 } //end main loop()
@@ -78,12 +77,13 @@ void calculateFinalAdvance() {
 void controlIgnition(float revolutions) {
   if (revolutions < 2000) {
     digitalWrite(ignPin, LOW);
+    lastFireTime = micros();
     Serial.println("We are in the LESS than 2000 RPM range");
   } else if (revolutions>=2000 && revolutions<RPM_LIMIT){
-      currentTime = micros();
-    if(lastFireTime + finalAdvanceTime < currentTime){
-      set LOW
-      lastfiretime = currentTime
-  }else{
-      set HIGH
+    if(lastFireTime + finalAdvanceTime < micros()){
+      digitalWrite(ignPin, LOW);
+      lastFireTime = micros();
+      Serial.println("We are in the GREATER than 2000 RPM range");
+    }else{
+      digitalWrite(ignPin, HIGH);
 }
