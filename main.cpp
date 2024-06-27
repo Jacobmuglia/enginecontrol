@@ -79,11 +79,9 @@ void controlIgnition(float revolutions) {
     Serial.println("We are in the LESS than 2000 RPM range");
   } else if (revolutions >= 2000 && revolutions < RPM_LIMIT) {
     if (lastFireTime + finalAdvanceTime < micros()) {
-      digitalWrite(ignPin, LOW);
+      digitalWrite(ignPin, HIGH);
       lastFireTime = micros();
       Serial.println("We are in the GREATER than 2000 RPM range");
-    } else {
-      digitalWrite(ignPin, HIGH);
     }
   }
 }
